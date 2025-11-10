@@ -31,9 +31,10 @@
   "devDependencies": {
     "@babel/core": "^7.22.0",
     "@babel/preset-env": "^7.22.0",
-    "@capacitor/cli": "^7.4.4",
     "@capacitor/core": "^7.4.4",
-    "@capacitor/ios": "^5.7.0",
+    "@capacitor/ios": "^7.4.4",
+    "@capacitor/android": "^7.4.4",
+    "@capacitor/cli": "^7.4.4",
     "@vue/compiler-sfc": "^3.3.0",
     "autoprefixer": "^10.4.0",
     "babel-loader": "^9.1.0",
