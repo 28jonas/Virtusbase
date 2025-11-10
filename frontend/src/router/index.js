@@ -1,4 +1,4 @@
-import { createRouter, createWebHashHistory } from 'vue-router'
+import { createRouter, createWebHashHistory,createWebHistory } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import Dashboard from '../views/Dashboard.vue'
 import Families from '../views/Families.vue'
@@ -104,7 +104,8 @@ const routes = [
 ]
 
 const router = createRouter({
-  history: createWebHashHistory(),
+  //history: createWebHashHistory(),
+  history: createWebHistory(),
   routes
 })
 
@@ -119,5 +120,6 @@ const router = createRouter({
 //     next()
 //   }
 // })
+
 
 export default router
