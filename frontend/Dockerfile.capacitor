@@ -1,0 +1,23 @@
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Installeer vereiste packages voor Android builds
+RUN apk add --no-cache openjdk11 git
+
+# Installeer Capacitor CLI globaal
+RUN npm install -g @capacitor/cli
+
+# Copy package files
+COPY package*.json ./
+
+# Installeer dependencies
+RUN npm install
+
+# Copy project files
+COPY . .
+
+# Voor Android development
+RUN apk add --no-cache android-tools
+
+CMD ["tail", "-f", "/dev/null"]
