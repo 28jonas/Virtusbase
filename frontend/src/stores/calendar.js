@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { api } from '../services/api'
 import axios from 'axios'
+import { API_BASE } from '../utils/config'
 
 export const useCalendarStore = defineStore('calendar', () => {
   //FUNCTIES VOOR DATBASE
@@ -14,7 +15,7 @@ export const useCalendarStore = defineStore('calendar', () => {
   // Actions
   const fetchCalendars = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/calendars', {
+      const response = await axios.get(`${API_BASE}/api/calendars`, {
         withCredentials: true // Zorg dat cookies worden meegestuurd
       })
       console.log(response.data.data)  
@@ -28,7 +29,7 @@ export const useCalendarStore = defineStore('calendar', () => {
 
   const createCalendar = async (calendarData) => {
     try {
-      const response = await api.post('http://localhost:8080/api/calendars', calendarData ,{
+      const response = await api.post(`${API_BASE}/api/calendars`, calendarData ,{
         withCredentials: true
       })
       calendars.value.push(response.data.data)

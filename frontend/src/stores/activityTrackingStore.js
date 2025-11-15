@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import axios from 'axios'
+import { API_BASE } from '../utils/config'
 
 export const useActivityTrackingStore = defineStore('activityTracking', () => {
   const selectedDate = ref(new Date().getDate())
@@ -19,7 +20,7 @@ export const useActivityTrackingStore = defineStore('activityTracking', () => {
   const loadActivityData = async () => {
     isLoading.value = true
     try {
-      const response = await axios.get('http://localhost:8080/api/activity-tracking', {
+      const response = await axios.get(`${API_BASE}/api/activity-tracking`, {
         withCredentials: true
       })
       const data = response.data
@@ -41,7 +42,7 @@ export const useActivityTrackingStore = defineStore('activityTracking', () => {
     isLoading.value = true
     
     try {
-      const response = await axios.post('http://localhost:8080/api/activity-tracking/select-date', {
+      const response = await axios.post(`${API_BASE}/api/activity-tracking/select-date`, {
         date: date,
         currentWeekStart: currentWeekStart.value
       }, {
@@ -66,7 +67,7 @@ export const useActivityTrackingStore = defineStore('activityTracking', () => {
   const previousWeek = async () => {
     isLoading.value = true
     try {
-      const response = await axios.post('http://localhost:8080/api/activity-tracking/previous-week', {
+      const response = await axios.post(`${API_BASE}/api/activity-tracking/previous-week`, {
         currentWeekStart: currentWeekStart.value,
         selectedDate: selectedDate.value
       }, {
@@ -88,7 +89,7 @@ export const useActivityTrackingStore = defineStore('activityTracking', () => {
   const nextWeek = async () => {
     isLoading.value = true
     try {
-      const response = await axios.post('http://localhost:8080/api/activity-tracking/next-week', {
+      const response = await axios.post(`${API_BASE}/api/activity-tracking/next-week`, {
         currentWeekStart: currentWeekStart.value,
         selectedDate: selectedDate.value
       }, {

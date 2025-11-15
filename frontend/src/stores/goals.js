@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import axios from 'axios'
+import { API_BASE } from '../utils/config'
 
 export const useGoalsStore = defineStore('goals', () => {
   // State
@@ -21,7 +22,7 @@ export const useGoalsStore = defineStore('goals', () => {
   // Actions
   const loadGoals = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/goals',{
+      const response = await axios.get(`${API_BASE}/api/goals`,{
         withCredentials: true
       })
       goals.value = response.data
@@ -32,7 +33,7 @@ export const useGoalsStore = defineStore('goals', () => {
 
   const loadCategories = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/categories?type=financial_goal', {
+      const response = await axios.get(`${API_BASE}/api/categories?type=financial_goal`, {
         withCredentials: true
       })
       categories.value = response.data
@@ -43,7 +44,7 @@ export const useGoalsStore = defineStore('goals', () => {
 
   const loadCards = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/cards',{
+      const response = await axios.get(`${API_BASE}/api/cards`,{
         withCredentials: true
       })
       cards.value = response.data.cards
@@ -83,7 +84,7 @@ export const useGoalsStore = defineStore('goals', () => {
 
   const addGoal = async () => {
     try {
-      const response = await axios.post('http://localhost:8080/api/goals', form.value, {
+      const response = await axios.post(`${API_BASE}/api/goals`, form.value, {
         withCredentials: true
       })
       await loadGoals()
@@ -96,7 +97,7 @@ export const useGoalsStore = defineStore('goals', () => {
 
   const updateGoal = async () => {
     try {
-      const response = await axios.put(`http://localhost:8080/api/goals/${editingGoalId.value}`, form.value, {
+      const response = await axios.put(`${API_BASE}/api/goals/${editingGoalId.value}`, form.value, {
         withCredentials: true
       })
       await loadGoals()

@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
 import { ref } from 'vue'
+import { API_BASE } from '../utils/config'
 
 export const useTypeStore = defineStore('type', () => {
     const types = ref([])
@@ -9,7 +10,9 @@ export const useTypeStore = defineStore('type', () => {
     const fetchTypes = async () => {
         loadingTypes.value = true
         try {
-            const response = await axios.get('http://localhost:8080/api/auth/types')
+            const response = await axios.get(`${API_BASE}/api/auth/types`, {
+                withCredentials: true
+            })
             console.log('Types fetched:', response.data);
             
             types.value = response.data

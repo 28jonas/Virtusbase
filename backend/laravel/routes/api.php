@@ -139,23 +139,23 @@ Route::middleware('jwt.validate')->group(function () {
     Route::get('/cards', [CardController::class, 'index']);
     Route::post('/cards', [CardController::class, 'store']);
     Route::post('/cards/transfer', [CardController::class, 'transfer']);
-    
+
     // Expenses
     Route::get('/expenses', [ExpenseController::class, 'index']);
     Route::post('/expenses', [ExpenseController::class, 'store']);
-    
+
     // Incomes
     Route::get('/incomes', [IncomeController::class, 'index']);
     Route::post('/incomes', [IncomeController::class, 'store']);
-    
+
     // Goals
     Route::get('/goals', [GoalController::class, 'index']);
     Route::post('/goals', [GoalController::class, 'store']);
     Route::put('/goals/{goal}', [GoalController::class, 'update']);
-    
+
     // Charts
     Route::get('/chart/balance', [ChartController::class, 'balanceHistory']);
-    
+
     // Misc
     Route::get('/banks', [CardController::class, 'banks']);
     Route::get('/categories', [CategoryController::class, 'index']);
@@ -165,29 +165,29 @@ Route::middleware('jwt.validate')->group(function () {
     Route::post('/cards', [CardController::class, 'store']);
     Route::post('/cards/transfer', [CardController::class, 'transfer']);
     Route::get('/banks', [CardController::class, 'banks']);
-    
+
     // Expenses
     Route::get('/expenses', [ExpenseController::class, 'index']);
     Route::post('/expenses', [ExpenseController::class, 'store']);
-    
+
     // Incomes
     Route::get('/incomes', [IncomeController::class, 'index']);
     Route::post('/incomes', [IncomeController::class, 'store']);
-    
+
     // Goals
     Route::get('/goals', [GoalController::class, 'index']);
     Route::post('/goals', [GoalController::class, 'store']);
     Route::put('/goals/{goal}', [GoalController::class, 'update']);
-    
+
     // Charts
     Route::get('/chart/balance', [ChartController::class, 'balanceHistory']);
-    
+
     // Transactions
     Route::get('/transactions', [TransactionController::class, 'index']);
-    
+
     // Stats
     Route::get('/stats/income-expense', [StatsController::class, 'incomeExpenseStats']);
-    
+
     // Categories
     Route::get('/categories', [CategoryController::class, 'index']);
 
@@ -238,8 +238,11 @@ Route::middleware('jwt.validate')->group(function () {
 
 
 // Login routes die doorsturen naar login-backend
+//Routes voor users
 Route::prefix('auth')->group(function () {
+
     Route::post('/login', function (Request $request) {
+        Log::info('[/auth/login] Request: ' . json_encode($request->all()));
         $response = Http::post('http://nginxlogin/api/auth/login', $request->all());
 
         Log::info('[/auth/login] Response: ' . json_encode($response->json()));
@@ -279,32 +282,29 @@ Route::prefix('auth')->group(function () {
     });
 
     Route::post('/refresh', function (Request $request) {
-        Log::info('=== AUTH REFRESH DEBUG ===');
-
         // Debug alle beschikbare informatie
         $allHeaders = $request->headers->all();
         $allCookies = $request->cookies->all();
         $cookieHeader = $request->header('Cookie');
+        Log::info('🔁 Main backend: /auth/refresh called', [
+            'request_data' => $request->all(),
+            'headers' => $allHeaders,
+            'cookies' => $allCookies
 
-        Log::info('All headers: ' . json_encode($allHeaders));
-        Log::info('All cookies: ' . json_encode($allCookies));
-        Log::info('Cookie header: ' . ($cookieHeader ?: 'MISSING'));
-        Log::info('Request method: ' . $request->method());
-        Log::info('Request URL: ' . $request->fullUrl());
-
+        ]);
         // Als er geen cookies zijn, probeer dan handmatig de Cookie header te construeren
-        if (empty($allCookies) && !$cookieHeader) {
-            Log::warning('No cookies found in request, attempting to construct Cookie header manually');
+        // if (empty($allCookies) && !$cookieHeader) {
+        //     Log::warning('No cookies found in request, attempting to construct Cookie header manually');
 
-            // Probeer cookies uit de headers te halen
-            foreach ($allHeaders as $name => $values) {
-                if (strtolower($name) === 'cookie') {
-                    $cookieHeader = is_array($values) ? implode('; ', $values) : $values;
-                    Log::info('Found Cookie header in headers: ' . $cookieHeader);
-                    break;
-                }
-            }
-        }
+        //     // Probeer cookies uit de headers te halen
+        //     foreach ($allHeaders as $name => $values) {
+        //         if (strtolower($name) === 'cookie') {
+        //             $cookieHeader = is_array($values) ? implode('; ', $values) : $values;
+        //             Log::info('Found Cookie header in headers: ' . $cookieHeader);
+        //             break;
+        //         }
+        //     }
+        // }
 
         try {
             // Gebruik withoutVerifying() voor eenvoud
@@ -315,9 +315,6 @@ Route::prefix('auth')->group(function () {
                     'Accept' => 'application/json',
                 ])
                 ->post('http://nginxlogin/api/auth/refresh');
-
-            Log::info('Backend response status: ' . $response->status());
-            Log::info('Backend response body: ' . $response->body());
 
             $backendResponse = response()->json($response->json(), $response->status());
 
@@ -364,10 +361,6 @@ Route::prefix('auth')->group(function () {
     });
 
     Route::get('/me', function (Request $request) {
-        Log::info('=== AUTH ME DEBUG ===');
-        Log::info('Cookies received: ' . json_encode($request->cookies->all()));
-        Log::info('Cookie header: ' . $request->header('Cookie'));
-
         $cookieHeader = $request->header('Cookie');
 
         try {
@@ -379,7 +372,26 @@ Route::prefix('auth')->group(function () {
                 ])
                 ->get('http://nginxlogin/api/me');
 
-            Log::info('Backend response status: ' . $response->status());
+            return response()->json($response->json(), $response->status());
+
+        } catch (\Exception $e) {
+            Log::error('Me endpoint error: ' . $e->getMessage());
+            return response()->json(['error' => 'Authentication check failed'], 500);
+        }
+    });
+
+
+    Route::get('/meInfo', function (Request $request) {
+        $cookieHeader = $request->header('Cookie');
+
+        try {
+            $response = Http::withoutVerifying()
+                ->withHeaders([
+                    'Cookie' => $cookieHeader ?: '',
+                    'Content-Type' => 'application/json',
+                    'Accept' => 'application/json',
+                ])
+                ->get('http://nginxlogin/api/meInfo');
 
             return response()->json($response->json(), $response->status());
 
@@ -389,12 +401,208 @@ Route::prefix('auth')->group(function () {
         }
     });
 
-    Route::get('/roles', function (Request $request) {
-        Log::info("request: " . json_encode($request->all()));
-        $response = Http::get('nginxlogin/api/roles', $request->all());
-        Log::info("response: " . json_encode($response->json()));
-        return response()->json($response->json(), $response->status());
+    Route::post('/verify-2fa', function (Request $request) {
+        try {
+            // Log::info('🔁 Main backend: /auth/verify-2fa called', ['request_data' => $request->all()]);
+
+            $response = Http::withoutVerifying()
+                ->withHeaders([
+                    'Cookie' => $request->header('Cookie', ''),
+                    'Authorization' => $request->header('Authorization', ''),
+                    'Content-Type' => 'application/json',
+                    'Accept' => 'application/json',
+                ])
+                ->post('http://nginxlogin/api/verify-2fa', $request->all());
+
+            // Log::info('🔁 Login backend response status: ' . $response->status());
+
+            // 🔥 DETAILED LOGGING VAN ALLE HEADERS
+            $allHeaders = $response->headers();
+            // Log::info('🔁 Login backend ALL headers:', $allHeaders);
+
+            $setCookieHeaders = $allHeaders['Set-Cookie'] ?? [];
+            // Log::info('🔁 Login backend Set-Cookie headers:', $setCookieHeaders);
+
+            // Maak de response
+            $backendResponse = response()->json($response->json(), $response->status());
+
+            // 🔥 STUUR ALLE SET-COOKIE HEADERS DOOR
+            if (!empty($setCookieHeaders)) {
+                foreach ($setCookieHeaders as $cookie) {
+                    // Log::info('🔁 Forwarding cookie: ' . $cookie);
+                    $backendResponse->headers->set('Set-Cookie', $cookie, false);
+                }
+            } else {
+                Log::warning('🔁 No Set-Cookie headers found in login backend response!');
+            }
+
+            // Log wat er uiteindelijk wordt teruggestuurd
+            $finalHeaders = $backendResponse->headers->all();
+            // Log::info('🔁 Final main backend headers:', [
+            //     'set-cookie' => $finalHeaders['set-cookie'] ?? 'No cookies set'
+            // ]);
+
+            return $backendResponse;
+
+        } catch (\Exception $e) {
+            Log::error('Verify 2FA endpoint error: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to verify 2FA'], 500);
+        }
     });
 
+    Route::post('/forgot-password', function (Request $request) {
+        try {
+            // Log::info('🔁 Main backend: /auth/forgot-password called', ['request_data' => $request->all()]);
 
+            $response = Http::withoutVerifying()
+                ->withHeaders([
+                    'Content-Type' => 'application/json',
+                    'Accept' => 'application/json',
+                ])
+                ->post('http://nginxlogin/api/forgot-password', $request->all());
+
+            // Log::info('🔁 Login backend response status: ' . $response->status());
+            // Log::info('🔁 Login backend response: ' . json_encode($response->json()));
+
+            return response()->json($response->json(), $response->status());
+
+        } catch (\Exception $e) {
+            Log::error('Forgot password endpoint error: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to process request'], 500);
+        }
+    });
+    Route::post('/reset-password', function (Request $request) {
+        try {
+            // Log::info('🔁 Main backend: /auth/forgot-password called', ['request_data' => $request->all()]);
+
+            $response = Http::withoutVerifying()
+                ->withHeaders([
+                    'Content-Type' => 'application/json',
+                    'Accept' => 'application/json',
+                ])
+                ->post('http://nginxlogin/api/reset-password', $request->all());
+
+            // Log::info('🔁 Login backend response status: ' . $response->status());
+            // Log::info('🔁 Login backend response: ' . json_encode($response->json()));
+
+            return response()->json($response->json(), $response->status());
+
+        } catch (\Exception $e) {
+            Log::error('Forgot password endpoint error: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to process request'], 500);
+        }
+    });
+
+    Route::post('/setup-authenticator-2fa', function (Request $request) {
+        try {
+            // Log::info('🔁 Main backend: setup-authenticator-2fa');
+
+            // Probeer JWT token uit cookie te halen
+            $token = $request->cookie('token');
+
+            if (!$token) {
+                Log::error('❌ No token cookie found');
+                return response()->json(['error' => 'Not authenticated'], 401);
+            }
+
+            // Log::info('✅ Found token cookie, length: ' . strlen($token));
+
+            $response = Http::withoutVerifying()
+                ->withHeaders([
+                    'Content-Type' => 'application/json',
+                    'Accept' => 'application/json',
+                    'Authorization' => 'Bearer ' . $token, // 🔥 Stuur als Bearer token
+                ])
+                ->post('http://nginxlogin/api/setup-authenticator-2fa', $request->all());
+
+            return response()->json($response->json(), $response->status());
+
+        } catch (\Exception $e) {
+            Log::error('Setup authenticator endpoint error: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to process request'], 500);
+        }
+    });
+
+    Route::post('/verify-authenticator-2fa', function (Request $request) {
+        try {
+            // Log::info('🔁 Main backend: verify-authenticator-2fa');
+
+            // Probeer JWT token uit cookie te halen
+            $token = $request->cookie('token');
+
+            if (!$token) {
+                Log::error('❌ No token cookie found');
+                return response()->json(['error' => 'Not authenticated'], 401);
+            }
+
+            // Log::info('✅ Found token cookie, length: ' . strlen($token));
+
+            $response = Http::withoutVerifying()
+                ->withHeaders([
+                    'Content-Type' => 'application/json',
+                    'Accept' => 'application/json',
+                    'Authorization' => 'Bearer ' . $token, // 🔥 Stuur als Bearer token
+                ])
+                ->post('http://nginxlogin/api/verify-authenticator-2fa', $request->all());
+
+            return response()->json($response->json(), $response->status());
+
+        } catch (\Exception $e) {
+            Log::error('Verify 2FA endpoint error: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to verify 2FA'], 500);
+        }
+    });
+
+    Route::post('/disable-2fa', function (Request $request) {
+        try {
+            // Log::info('🔁 Main backend: disable-2fa', ['request_data' => $request->all()]);
+
+            $response = Http::withoutVerifying()
+                ->withHeaders([
+                    'Content-Type' => 'application/json',
+                    'Accept' => 'application/json',
+                ])
+                ->post('http://nginxlogin/api/disable-2fa', $request->all());
+
+            // Log::info('🔁 Login backend response status: ' . $response->status());
+            // Log::info('🔁 Login backend response: ' . json_encode($response->json()));
+
+            return response()->json($response->json(), $response->status());
+
+        } catch (\Exception $e) {
+            Log::error('Forgot password endpoint error: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to process request'], 500);
+        }
+    });
+
+    Route::post('/verify-recovery-code', function (Request $request) {
+        try {
+            // Log::info('🔁 Main backend: verify-recovery-code', ['request_data' => $request->all()]);
+
+            $response = Http::withoutVerifying()
+                ->withHeaders([
+                    'Content-Type' => 'application/json',
+                    'Accept' => 'application/json',
+                ])
+                ->post('http://nginxlogin/api/verify-recovery-code', $request->all());
+
+            // Log::info('🔁 Login backend response status: ' . $response->status());
+            // Log::info('🔁 Login backend response: ' . json_encode($response->json()));
+
+            // 🔥 BELANGRIJK: Stuur Set-Cookie headers door naar de frontend
+            $backendResponse = response()->json($response->json(), $response->status());
+            // Log::info('Response: ' . json_encode($response->json()));
+            if (isset($response->headers()['Set-Cookie'])) {
+                foreach ($response->headers()['Set-Cookie'] as $cookie) {
+                    $backendResponse->header('Set-Cookie', $cookie, false);
+                }
+            }
+
+            return $backendResponse;
+
+        } catch (\Exception $e) {
+            Log::error('Forgot password endpoint error: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to process request'], 500);
+        }
+    });
 });

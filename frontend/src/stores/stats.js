@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import axios from 'axios'
+import { API_BASE } from '../utils/config'
 
 export const useStatsStore = defineStore('stats', () => {
   // State
@@ -12,7 +13,7 @@ export const useStatsStore = defineStore('stats', () => {
   // Actions
   const loadStats = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/stats/income-expense', {
+      const response = await axios.get(`${API_BASE}/api/stats/income-expense`, {
         withCredentials: true
       })
       const data = response.data

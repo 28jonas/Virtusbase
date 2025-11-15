@@ -1,4 +1,6 @@
 <template>
+  <Header />
+  <Sidebar />
   <div class="p-6 space-y-6">
     <!-- Stats Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -71,6 +73,8 @@
 
 <script setup>
 //import { onMounted, ref } from 'vue';
+import Sidebar from './components/layout/Sidebar.vue'
+import Header from './components/layout/Header.vue'
 
 //Import van stores
 import { useDashboardStore } from '../stores/dashboard'

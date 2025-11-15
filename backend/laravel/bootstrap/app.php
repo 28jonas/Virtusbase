@@ -13,7 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
-            'cors' => \App\Http\Middleware\Cors::class,
+            //'cors' => \App\Http\Middleware\Cors::class,
             'jwt.validate' => \App\Http\Middleware\JwtValidateOnly::class,
 
         ]);

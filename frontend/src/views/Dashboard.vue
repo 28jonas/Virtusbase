@@ -17,61 +17,87 @@
       </div>
     </div>
 
-    <!-- KPI Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      <KPICard 
-        title="Familie Overzicht"
-        :value="stats.families"
-        subtitle="Actieve families"
-        icon="👨‍👩‍👧‍👦"
-        trend="+2 deze maand"
-        color="blue"
-      />
-      <KPICard 
-        title="Habit Streak"
-        :value="stats.habitStreak"
-        subtitle="dagen consistent"
-        icon="🔥"
-        trend="+5 dagen"
-        color="green"
-      />
-      <KPICard 
-        title="Open Taken"
-        :value="stats.openTodos"
-        subtitle="voor vandaag"
-        icon="📝"
-        trend="-3 sinds gisteren"
-        color="orange"
-      />
-      <KPICard 
-        title="Productiviteit"
-        :value="`${stats.productivity}%`"
-        subtitle="van doelen bereikt"
-        icon="📈"
-        trend="+12%"
-        color="purple"
-      />
+    <!-- Loading State -->
+    <div v-if="loading" class="text-center py-12">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+      <p class="text-gray-600 dark:text-gray-400 mt-4">Data laden...</p>
     </div>
 
-    <!-- Main Content Grid -->
-    <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
-      
-      <!-- Linkerkolom -->
-      <div class="space-y-8">
-        <TodayTasks :tasks="sortedTodayTasks" />
-        <HabitProgress :habits="todayHabits" />
+    <!-- Error State -->
+    <div v-else-if="hasError" class="text-center py-12">
+      <div class="text-red-500 text-6xl mb-4">❌</div>
+      <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+        Oeps! Er ging iets mis
+      </h3>
+      <p class="text-gray-600 dark:text-gray-400 mb-4">
+        We konden de data niet laden. Probeer de pagina te vernieuwen.
+      </p>
+      <button 
+        @click="loadData"
+        class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors"
+      >
+        Opnieuw proberen
+      </button>
+    </div>
+
+    <!-- Content wanneer geladen -->
+    <div v-else>
+      <!-- KPI Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <KPICard 
+          title="Familie Overzicht"
+          :value="stats.families"
+          subtitle="Actieve families"
+          icon="👨‍👩‍👧‍👦"
+          trend="+2 deze maand"
+          color="blue"
+        />
+        <KPICard 
+          title="Habit Streak"
+          :value="stats.habitStreak"
+          subtitle="dagen consistent"
+          icon="🔥"
+          trend="+5 dagen"
+          color="green"
+        />
+        <KPICard 
+          title="Open Taken"
+          :value="stats.openTodos"
+          subtitle="voor vandaag"
+          icon="📝"
+          trend="-3 sinds gisteren"
+          color="orange"
+        />
+        <KPICard 
+          title="Productiviteit"
+          :value="`${stats.productivity}%`"
+          subtitle="van doelen bereikt"
+          icon="📈"
+          trend="+12%"
+          color="purple"
+        />
       </div>
-      
-      <!-- Middelkolom -->
-      <div class="space-y-8">
-        <FocusTimer />
-        <MiniCalendar :events="todayEvents" />
-      </div>
-      
-      <!-- Rechterkolom -->
-      <div class="space-y-8">
-        <QuickActions />
-        <WeeklyInsights :data="weeklyData" />
+
+      <!-- Main Content Grid -->
+      <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+        
+        <!-- Linkerkolom -->
+        <div class="space-y-8">
+          <TodayTasks :tasks="sortedTodayTasks" />
+          <HabitProgress :habits="todayHabits" />
+        </div>
+        
+        <!-- Middelkolom -->
+        <div class="space-y-8">
+          <FocusTimer />
+          <MiniCalendar :events="todayEvents" />
+        </div>
+        
+        <!-- Rechterkolom -->
+        <div class="space-y-8">
+          <QuickActions />
+          <WeeklyInsights :data="weeklyData" />
+        </div>
       </div>
     </div>
   </div>
@@ -101,96 +127,77 @@ const todoStore = useTodoStore()
 const calendarStore = useCalendarStore()
 const eventStore = useEventStore()
 
-
 const user = ref(null)
 const loading = ref(true)
-const todayTasks = ref([])
-//const todayHabits = ref([])
-//const todayEvents = ref([])
-//const weeklyData = ref([])
+const hasError = ref(false)
 
-const familiesCount = computed(() => familyStore.families.length)
-const habitsCount = computed(() => habitStore.habits.length)
-const todosStats = computed(() => todoStore.fetchStats()?.value ?? {}); 
-console.log("Todos stats:", todosStats.value)
-
-
-onMounted(async () => {
+const loadData = async () => {
   try {
-    user.value = await authStore.meInfo()
+    loading.value = true
+    hasError.value = false
+    
+    console.log('Starting data load...')
+    
+    // 1. Laad user info eerst
+    //user.value = await authStore.meInfo()
+    //console.log('User loaded:', user.value)
 
+    // 2. Laad alle data parallel
     await Promise.all([
       familyStore.fetchFamilies(),
-      todoStore.fetchStats(),
-      todoStore.fetchTodos(), // Verwijder de toewijzing hier
       habitStore.fetchHabits(),
-      todoStore.fetchEvents(),
-      calendarStore.fetchEvents(),
+      todoStore.fetchTodos(),
+      eventStore.fetchEvents(),
     ])
-    console.log('todostore', todoStore.todos)
-    // CORRECT: Gebruik .value om de ref aan te passen
-    todayTasks.value = todoStore.pendingTodos
-    console.log('Events:', calendarStore.events)
-    console.log('Open todos:', todoStore.pendingTodos)
-    console.log('Completed todos:', todoStore.completedTodos)
-    console.log('User data:', user.value)
+
+    console.log('All data loaded successfully')
+    console.log('- Families:', familyStore.families.length)
+    console.log('- Habits:', habitStore.habits.length)
+    console.log('- Todos:', todoStore.todos.length)
+    console.log('- Events:', eventStore.events.length)
+
   } catch (error) {
-    console.error('Failed to fetch user data:', error)
+    console.error('Failed to load dashboard data:', error)
+    hasError.value = true
   } finally {
     loading.value = false
   }
+}
+
+onMounted(() => {
+  loadData()
 })
 
-// Voor sortering op priority (voeg deze computed property toe):
+// Computed properties
+const stats = computed(() => ({
+  families: familyStore.families?.length || 0,
+  habitStreak: habitStore.habits?.reduce((total, habit) => total + (habit.streak || 0), 0) || 0,
+  openTodos: todoStore.todos?.filter(todo => !todo.completed).length || 0,
+  productivity: 78
+}))
+
 const sortedTodayTasks = computed(() => {
-  // Maak een kopie van de array om te sorteren
-  console.log('Today tasks:', todoStore.todos)
-  const tasks = [...todoStore.todos]
-  console.log('Tasks:', tasks)
-  // Sorteer op priority: high > medium > low
+  const todos = todoStore.todos || []
+  const todayTasks = todos.filter(todo => !todo.completed)
   const priorityOrder = { high: 3, medium: 2, low: 1 }
   
-  return tasks.sort((a, b) => {
+  return todayTasks.sort((a, b) => {
     return priorityOrder[b.priority] - priorityOrder[a.priority]
   })
 })
 
-// const todayTasks = ref([
-//   { id: 1, title: 'Boodschappen doen', completed: false, priority: 'medium' },
-//   { id: 2, title: 'Sporten', completed: true, priority: 'high' },
-//   { id: 3, title: 'Boek lezen', completed: false, priority: 'low' }
-// ])
-
-const stats = ref({
-  families: familiesCount.value,
-  habitStreak: habitsCount.value,
-  openTodos: todoStore.pendingTodos,
-  productivity: 78
-})
-
 const todayHabits = computed(() => {
-  const habits = [...habitStore.habits]
-  return habits.sort((a, b) => b.streak - a.streak)
+  const habits = habitStore.habits || []
+  return habits.sort((a, b) => (b.streak || 0) - (a.streak || 0))
 })
-
-// const todayHabits = ref([
-//   { id: 1, name: 'Meditatie', completed: true, streak: 5 },
-//   { id: 2, name: 'Water drinken', completed: false, streak: 12 },
-//   { id: 3, name: 'Early workout', completed: true, streak: 8 }
-// ])
 
 const todayEvents = computed(() => {
-  const events = [...eventStore.events]
-  return events.sort((a, b) => new Date(a.time) - new Date(b.time))
+  const events = eventStore.events || []
+  return events.sort((a, b) => new Date(a.time || 0) - new Date(b.time || 0))
 })
 
-// const todayEvents = ref([
-//   { id: 1, title: 'Team meeting', time: '10:00', type: 'work' },
-//   { id: 2, title: 'Lunch met familie', time: '13:00', type: 'personal' }
-// ])
-
-const weeklyData = ref({
+const weeklyData = computed(() => ({
   productivity: [65, 78, 82, 75, 88, 90, 78],
   habits: [80, 75, 90, 85, 95, 88, 92]
-})
+}))
 </script>

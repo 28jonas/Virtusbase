@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import axios from 'axios'
+import { API_BASE } from '../utils/config'
 
 export const useHabitStore = defineStore('habit', () => {
   // State
@@ -26,7 +27,7 @@ export const useHabitStore = defineStore('habit', () => {
   const fetchHabits = async (date = null) => {
     try {
       const params = date ? { week_start: date } : {}
-      const res = await axios.get('http://localhost:8080/api/habits', {
+      const res = await axios.get(`${API_BASE}/api/habits`, {
         params,
         withCredentials: true
       })
@@ -42,7 +43,7 @@ export const useHabitStore = defineStore('habit', () => {
 
   const createHabit = async (payload) => {
     try {
-      const res = await axios.post('http://localhost:8080/api/habits', payload, {
+      const res = await axios.post(`${API_BASE}/api/habits`, payload, {
         withCredentials: true
       })
       habits.value.push(res.data.data)
@@ -55,7 +56,7 @@ export const useHabitStore = defineStore('habit', () => {
 
   const updateHabit = async (id, payload) => {
     try {
-      const res = await axios.put(`http://localhost:8080/api/habits/${id}`, payload, {
+      const res = await axios.put(`${API_BASE}/api/habits/${id}`, payload, {
         withCredentials: true
       })
       const idx = habits.value.findIndex(h => h.id === id)
@@ -69,7 +70,7 @@ export const useHabitStore = defineStore('habit', () => {
 
   const deleteHabit = async (id) => {
     try {
-      await axios.delete(`http://localhost:8080/api/habits/${id}`, {
+      await axios.delete(`${API_BASE}/api/habits/${id}`, {
         withCredentials: true
       })
       habits.value = habits.value.filter(h => h.id !== id)
@@ -81,7 +82,7 @@ export const useHabitStore = defineStore('habit', () => {
 
   const toggleHabitCompletion = async (habitId, date) => {
   try {
-    const res = await axios.patch(`http://localhost:8080/api/habits/${habitId}/toggle-completion`, 
+    const res = await axios.patch(`${API_BASE}/api/habits/${habitId}/toggle-completion`, 
       { date },
       { withCredentials: true }
     )
@@ -120,7 +121,7 @@ export const useHabitStore = defineStore('habit', () => {
 
   const fetchStats = async () => {
     try {
-      const res = await axios.get('http://localhost:8080/api/habits/stats', {
+      const res = await axios.get(`${API_BASE}/api/habits/stats`, {
         withCredentials: true
       })
       stats.value = res.data.data

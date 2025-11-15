@@ -8,7 +8,7 @@ export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = computed(() => !!user.value)
 
   // API base URL
-  const API_BASE = 'http://localhost:8080/api'
+  const API_BASE = 'http://192.168.0.126:8080';
 
   // Fetch met automatische token refresh
   async function authenticatedFetch(url, options = {}) {

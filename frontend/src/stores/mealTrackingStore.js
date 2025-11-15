@@ -2,6 +2,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import axios from 'axios'
+import { API_BASE } from '../utils/config'
 
 export const useMealTrackingStore = defineStore('mealTracking', () => {
   const date = ref(new Date().toISOString().split('T')[0])
@@ -38,7 +39,7 @@ export const useMealTrackingStore = defineStore('mealTracking', () => {
   const loadMeals = async () => {
     isLoading.value = true
     try {
-      const response = await axios.get('http://localhost:8080/api/meals', {
+      const response = await axios.get(`${API_BASE}/api/meals`, {
         params: { date: date.value },
         withCredentials: true
       })
@@ -53,7 +54,7 @@ export const useMealTrackingStore = defineStore('mealTracking', () => {
 
   const loadMealTypes = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/meal-types', {
+      const response = await axios.get(`${API_BASE}/api/meal-types`, {
         withCredentials: true
       })
       mealTypes.value = response.data
@@ -102,7 +103,7 @@ export const useMealTrackingStore = defineStore('mealTracking', () => {
     isLoading.value = true
     try {
       const targetDate = specificDate || date.value
-      const response = await axios.get('http://localhost:8080/api/meals', {
+      const response = await axios.get(`${API_BASE}/api/meals`, {
         params: { date: targetDate },
         withCredentials: true
       })

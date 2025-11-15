@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import axios from 'axios'
+import { API_BASE } from '../utils/config'
 
 export const useBankingStore = defineStore('banking', () => {
   // State
@@ -30,7 +31,7 @@ export const useBankingStore = defineStore('banking', () => {
   // Actions
   const loadCards = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/cards',{
+      const response = await axios.get(`${API_BASE}/api/cards`,{
         withCredentials: true
       })
       cards.value = response.data.cards
@@ -43,7 +44,7 @@ export const useBankingStore = defineStore('banking', () => {
 
   const loadBanks = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/banks', {
+      const response = await axios.get(`${API_BASE}/api/banks`, {
         withCredentials: true
       })
       banks.value = response.data
@@ -115,7 +116,7 @@ export const useBankingStore = defineStore('banking', () => {
       // Manual validation
       validateCardNumber(form.value.cardNumber, form.value.selectedBankId)
 
-      const response = await axios.post('http://localhost:8080/api/cards', {
+      const response = await axios.post(`${API_BASE}/api/cards`, {
       card_number: form.value.cardNumber.replace(/\s+/g, ''),
       expiry_date: form.value.expiryDate,
       balance: form.value.balance,
@@ -136,7 +137,7 @@ export const useBankingStore = defineStore('banking', () => {
 
   const transferMoney = async () => {
     try {
-      const response = await axios.post('http://localhost:8080/api/cards/transfer', transferForm.value, {
+      const response = await axios.post(`${API_BASE}/api/cards/transfer`, transferForm.value, {
         withCredentials: true
       })
       await loadCards()

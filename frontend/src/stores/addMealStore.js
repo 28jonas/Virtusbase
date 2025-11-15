@@ -2,6 +2,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import axios from 'axios'
+import { API_BASE } from '../utils/config'
 
 export const useAddMealStore = defineStore('addMeal', () => {
   const mealTypes = ref([])
@@ -26,7 +27,7 @@ export const useAddMealStore = defineStore('addMeal', () => {
 
   const loadMealTypes = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/meal-types', {
+      const response = await axios.get(`${API_BASE}/api/meal-types`, {
         withCredentials: true
       })
       mealTypes.value = response.data
@@ -37,7 +38,7 @@ export const useAddMealStore = defineStore('addMeal', () => {
 
   const loadAvailableFoodItems = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/food-items/search', {
+      const response = await axios.get(`${API_BASE}/api/food-items/search`, {
         params: { search: search.value },
         withCredentials: true
       })
@@ -90,7 +91,7 @@ export const useAddMealStore = defineStore('addMeal', () => {
     errors.value = {}
 
     try {
-      const response = await axios.post('http://localhost:8080/api/meals', {
+      const response = await axios.post(`${API_BASE}/api/meals`, {
         meal: meal.value,
         food_items: selectedFoodItems.value
       }, {

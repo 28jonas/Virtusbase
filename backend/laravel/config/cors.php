@@ -6,7 +6,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:8100', 'http://localhost:3001'],
+    'allowed_origins' => ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:8100', 'http://localhost:3001', 'http://192.168.0.126:5173','http://192.168.0.126:8080','http://localhost:8100'],
 
     'allowed_origins_patterns' => [],
 

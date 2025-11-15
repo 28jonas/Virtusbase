@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import axios from 'axios'
+import { API_BASE } from '../utils/config'
 
 export const useHealthMetricsStore = defineStore('healthMetrics', () => {
   const steps = ref(0)
@@ -27,7 +28,7 @@ export const useHealthMetricsStore = defineStore('healthMetrics', () => {
   const loadData = async () => {
     isLoading.value = true
     try {
-      const response = await axios.get('http://localhost:8080/api/health-metrics', {
+      const response = await axios.get(`${API_BASE}/api/health-metrics`, {
         withCredentials: true
       })
       const data = response.data
@@ -51,7 +52,7 @@ export const useHealthMetricsStore = defineStore('healthMetrics', () => {
     if (isLoading.value) return
     
     try {
-      const response = await axios.post('http://localhost:8080/api/health-metrics/water', {}, {
+      const response = await axios.post(`${API_BASE}/api/health-metrics/water`, {}, {
         withCredentials: true
       })
       const data = response.data

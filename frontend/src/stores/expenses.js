@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import axios from 'axios'
+import { API_BASE } from '../utils/config'
 
 export const useExpensesStore = defineStore('expenses', () => {
   // State
@@ -50,7 +51,7 @@ export const useExpensesStore = defineStore('expenses', () => {
   // Actions
   const loadExpenses = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/expenses', {
+      const response = await axios.get(`${API_BASE}/api/expenses`, {
         withCredentials: true
       })
       expenses.value = response.data
@@ -61,7 +62,7 @@ export const useExpensesStore = defineStore('expenses', () => {
 
   const loadExpensesByCategory = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/expenses', {
+      const response = await axios.get(`${API_BASE}/api/expenses`, {
         withCredentials: true
       })
 
@@ -108,7 +109,7 @@ export const useExpensesStore = defineStore('expenses', () => {
 
   const loadCategories = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/categories?type=expense_category', {
+      const response = await axios.get(`${API_BASE}/api/categories?type=expense_category`, {
         withCredentials: true
       })
       categories.value = response.data
@@ -119,7 +120,7 @@ export const useExpensesStore = defineStore('expenses', () => {
 
   const loadCards = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/cards', {
+      const response = await axios.get(`${API_BASE}/api/cards`, {
         withCredentials: true
       })
       cards.value = response.data.cards
@@ -130,7 +131,7 @@ export const useExpensesStore = defineStore('expenses', () => {
 
   const addExpense = async () => {
     try {
-      const response = await axios.post('http://localhost:8080/api/expenses', form.value, {
+      const response = await axios.post(`${API_BASE}/api/expenses`, form.value, {
         withCredentials: true
       })
       await loadExpenses()

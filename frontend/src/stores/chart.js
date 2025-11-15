@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import axios from 'axios'
+import { API_BASE } from '../utils/config'
 
 export const useChartStore = defineStore('charts', () => {
   // State
@@ -89,7 +90,7 @@ export const useChartStore = defineStore('charts', () => {
   // Actions
   const loadCards = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/cards',{
+      const response = await axios.get(`${API_BASE}/api/cards`,{
         withCredentials:true
       })
       cards.value = response.data.cards
@@ -106,7 +107,7 @@ export const useChartStore = defineStore('charts', () => {
 
     loading.value = true
     try {
-      const response = await axios.get('http://localhost:8080/api/chart/balance', {
+      const response = await axios.get(`${API_BASE}/api/chart/balance`, {
         withCredentials: true,
         params: {
           card_id: selectedCardId.value,

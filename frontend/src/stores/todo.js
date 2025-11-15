@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import axios from 'axios'
+import { API_BASE } from '../utils/config'
 
 export const useTodoStore = defineStore('todo', () => {
   // State
@@ -19,12 +20,13 @@ export const useTodoStore = defineStore('todo', () => {
   // Actions
   const fetchTodos = async (params = {}) => {
     try {
-      const res = await axios.get('http://localhost:8080/api/todos', {
+      const res = await axios.get(`${API_BASE}/api/todos`, {
         params,
         withCredentials: true
       })
       todos.value = res.data.data.todos
       stats.value = res.data.data.stats
+      console.log(stats.value)
     } catch (err) {
       console.error('Failed to fetch todos:', err)
       throw err
@@ -33,7 +35,7 @@ export const useTodoStore = defineStore('todo', () => {
 
   const fetchStats = async () => {
     try {
-      const res = await axios.get('http://localhost:8080/api/todos/stats', {
+      const res = await axios.get(`${API_BASE}/api/todos/stats`, {
         withCredentials: true
       })
       stats.value = res.data.data
@@ -46,7 +48,7 @@ export const useTodoStore = defineStore('todo', () => {
 
   const createTodo = async (payload) => {
     try {
-      const res = await axios.post('http://localhost:8080/api/todos', payload, {
+      const res = await axios.post(`${API_BASE}/api/todos`, payload, {
         withCredentials: true
       })
       todos.value.push(res.data.data)
@@ -59,7 +61,7 @@ export const useTodoStore = defineStore('todo', () => {
 
   const updateTodo = async (id, payload) => {
     try {
-      const res = await axios.put(`http://localhost:8080/api/todos/${id}`, payload, {
+      const res = await axios.put(`${API_BASE}/api/todos/${id}`, payload, {
         withCredentials: true
       })
       const idx = todos.value.findIndex(t => t.id === id)
@@ -75,7 +77,7 @@ export const useTodoStore = defineStore('todo', () => {
 
   const deleteTodo = async (id) => {
     try {
-      await axios.delete(`http://localhost:8080/api/todos/${id}`, {
+      await axios.delete(`${API_BASE}/api/todos/${id}`, {
         withCredentials: true
       })
       todos.value = todos.value.filter(t => t.id !== id)
@@ -87,7 +89,7 @@ export const useTodoStore = defineStore('todo', () => {
 
   const toggleComplete = async (id) => {
     try {
-      const res = await axios.patch(`http://localhost:8080/api/todos/${id}/toggle-complete`, {}, {
+      const res = await axios.patch(`${API_BASE}/api/todos/${id}/toggle-complete`, {}, {
         withCredentials: true
       })
       const idx = todos.value.findIndex(t => t.id === id)
@@ -106,12 +108,12 @@ export const useTodoStore = defineStore('todo', () => {
     // State
     todos,
     stats,
-    
+
     // Computed
     totalTodos,
     completedTodos,
     pendingTodos,
-    
+
     // Actions
     fetchTodos,
     fetchStats,

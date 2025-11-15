@@ -1,7 +1,8 @@
+// stores/family.js
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { api } from '../services/api'
 import axios from 'axios'
+import { API_BASE } from '../utils/config'
 
 export const useFamilyStore = defineStore('family', () => {
   // State
@@ -10,50 +11,65 @@ export const useFamilyStore = defineStore('family', () => {
   const loading = ref(false)
   const error = ref(null)
 
-
   // Actions
   const fetchFamilies = async () => {
+    loading.value = true
+    error.value = null
     try {
-      const response = await axios.get('http://localhost:8080/api/families', {
-        withCredentials: true // Zorg dat cookies worden meegestuurd
-      })  
-      families.value = response.data.data
-    } catch (error) {
-      console.error('Error fetching families:', error)
-      throw error
+      console.log('Fetching families...')
+      const response = await axios.get(`${API_BASE}/api/families`, {
+        withCredentials: true
+      })
+      
+      console.log('Families response:', response.data)
+      families.value = response.data.data || []
+      console.log('Families stored:', families.value.length)
+      
+      return families.value
+    } catch (err) {
+      error.value = err.response?.data?.message || 'Failed to fetch families'
+      console.error('Error fetching families:', err)
+      families.value = [] // Reset naar lege array bij error
+      throw err
+    } finally {
+      loading.value = false
     }
   }
 
   const createFamily = async (familyData) => {
+    loading.value = true
     try {
-      //const response = await api.post('/families', familyData)
-      const response = await axios.post('http://localhost:8080/api/families', familyData, {
-      withCredentials: true // Dit is de correcte configuratie
-    }) 
+      const response = await axios.post(`${API_BASE}/api/families`, familyData, {
+        withCredentials: true
+      })
       families.value.push(response.data.data)
       return response.data
-    } catch (error) {
-      console.error('Error creating family:', error)
-      throw error.response.data
+    } catch (err) {
+      console.error('Error creating family:', err)
+      throw err.response?.data || err
+    } finally {
+      loading.value = false
     }
   }
 
   const addMember = async (email, familyId, memberRole) => {
     try {
-      console.log('familyId:', familyId, 'memberData:', email, 'role:', memberRole)
+      console.log('Adding member:', { email, familyId, memberRole })
       const memberData = {
-          email: email,    // of gewoon `email`
-          family_id: familyId,
-          role: memberRole
-      };
-      const response = await axios.post(`http://localhost:8080/api/families/${familyId}/members`, memberData, {
-      withCredentials: true // Zorg dat cookies worden meegestuurd
-    });
-      await fetchFamilies()
+        email: email,
+        family_id: familyId,
+        role: memberRole
+      }
+      
+      const response = await axios.post(`${API_BASE}/api/families/${familyId}/members`, memberData, {
+        withCredentials: true
+      })
+      
+      await fetchFamilies() // Refresh de families
       return response.data
-    } catch (error) {
-      console.error('Error adding member:', error)
-      throw error.response.data
+    } catch (err) {
+      console.error('Error adding member:', err)
+      throw err.response?.data || err
     }
   }
 
@@ -61,9 +77,9 @@ export const useFamilyStore = defineStore('family', () => {
     loading.value = true
     error.value = null
     try {
-      const response = await axios.get(`http://localhost:8080/api/families/${id}`, {
-        withCredentials: true // Zorg dat cookies worden meegestuurd
-      })  
+      const response = await axios.get(`${API_BASE}/api/families/${id}`, {
+        withCredentials: true
+      })
       
       currentFamily.value = response.data
       return response.data
@@ -76,15 +92,23 @@ export const useFamilyStore = defineStore('family', () => {
     }
   }
 
-  // Return state and actions
+  // Getters als computed properties
+  const familiesCount = () => families.value.length
+
   return {
+    // State
     families,
     currentFamily,
+    loading,
+    error,
+    
+    // Actions
     fetchFamilies,
     createFamily,
     addMember,
     fetchFamilyById,
-    loading,
-    error,
+    
+    // Getters
+    familiesCount
   }
 })

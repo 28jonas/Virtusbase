@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import axios from 'axios'
+import { API_BASE } from '../utils/config'
 
 export const useHealthGoalsStore = defineStore('healthGoals', () => {
   const goals = ref([])
@@ -42,7 +43,7 @@ export const useHealthGoalsStore = defineStore('healthGoals', () => {
   const loadGoals = async () => {
     isLoading.value = true
     try {
-      const response = await axios.get('http://localhost:8080/api/health-goals',{
+      const response = await axios.get(`${API_BASE}/api/health-goals`,{
         withCredentials: true
       })
       goals.value = response.data
@@ -56,7 +57,7 @@ export const useHealthGoalsStore = defineStore('healthGoals', () => {
   const addGoal = async () => {
     isLoading.value = true
     try {
-      const response = await axios.post('http://localhost:8080/api/health-goals', form.value, {
+      const response = await axios.post(`${API_BASE}/api/health-goals`, form.value, {
         withCredentials: true
       })
       goals.value.push(response.data)
@@ -77,7 +78,7 @@ export const useHealthGoalsStore = defineStore('healthGoals', () => {
 
   const deleteGoal = async (id) => {
     try {
-      await axios.delete(`http://localhost:8080/api/health-goals/${id}`, {
+      await axios.delete(`${API_BASE}/api/health-goals/${id}`, {
         withCredentials: true
       })
       goals.value = goals.value.filter(goal => goal.id !== id)

@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import axios from "axios";
+import { API_BASE } from "../utils/config";
 
 export const useEventStore = defineStore("event", () => {
     const events = ref([]);
@@ -10,7 +11,7 @@ export const useEventStore = defineStore("event", () => {
     const fetchEvents = async (params = {}) => {
         try {
             loading.value = true;
-            const response = await axios.get('http://localhost:8080/api/events', {
+            const response = await axios.get(`${API_BASE}/api/events`, {
                 params,
                 withCredentials: true
             });
@@ -31,7 +32,7 @@ export const useEventStore = defineStore("event", () => {
         try {
             //const response = await api.post('/api/events', eventData)
             //console.log('eventData:', eventData)
-            const response = await axios.post(`http://localhost:8080/api/calendars/${eventData.calendar_id}/events`, eventData, {
+            const response = await axios.post(`${API_BASE}/api/calendars/${eventData.calendar_id}/events`, eventData, {
                 withCredentials: true
             })
             events.value.push(response.data.data)

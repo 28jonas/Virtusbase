@@ -2,7 +2,15 @@
   "appId": "com.jouwbedia.app",
   "appName": "Virtusbase",
   "webDir": "dist",
+  "plugins": {
+    "Keyboard": {
+      "resize": "body",
+      "style": "default",
+      "resizeOnFullScreen": true
+    }
+  },
   "server": {
-    "androidScheme": "https"
+    "url": "http://192.168.0.126:5173",
+    "cleartext": true
   }
 }

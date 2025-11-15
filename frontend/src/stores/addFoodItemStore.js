@@ -2,6 +2,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import axios from 'axios'
+import { API_BASE } from '../utils/config'
 
 export const useAddFoodItemStore = defineStore('addFoodItem', () => {
   const isLoading = ref(false)
@@ -51,7 +52,7 @@ export const useAddFoodItemStore = defineStore('addFoodItem', () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:8080/api/food-items', formData, {
+      const response = await axios.post(`${API_BASE}/api/food-items`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         },

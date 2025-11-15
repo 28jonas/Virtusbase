@@ -2,6 +2,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import axios from 'axios'
+import { API_BASE } from '../utils/config'
 
 export const useMealViewerStore = defineStore('mealViewer', () => {
   const nextMeal = ref(null)
@@ -12,7 +13,7 @@ export const useMealViewerStore = defineStore('mealViewer', () => {
   const loadNextMeal = async () => {
     isLoading.value = true
     try {
-      const response = await axios.get('http://localhost:8080/api/meals/next', {
+      const response = await axios.get(`${API_BASE}/api/meals/next`, {
         withCredentials: true
       })
       nextMeal.value = response.data.meal

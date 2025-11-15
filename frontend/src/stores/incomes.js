@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import axios from 'axios'
+import { API_BASE } from '../utils/config'
 
 export const useIncomesStore = defineStore('incomes', () => {
   // State
@@ -50,7 +51,7 @@ export const useIncomesStore = defineStore('incomes', () => {
   // Actions
   const loadIncomes = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/incomes', {
+      const response = await axios.get(`${API_BASE}/api/incomes`, {
         withCredentials: true
       })
       incomes.value = response.data
@@ -61,7 +62,7 @@ export const useIncomesStore = defineStore('incomes', () => {
 
   const loadIncomesByCategory = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/incomes', {
+      const response = await axios.get(`${API_BASE}/api/incomes`, {
         withCredentials: true
       })
 
@@ -108,7 +109,7 @@ export const useIncomesStore = defineStore('incomes', () => {
 
   const loadCategories = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/categories?type=income_category', {
+      const response = await axios.get(`${API_BASE}/api/categories?type=income_category`, {
         withCredentials:true
       })
       categories.value = response.data
@@ -119,7 +120,7 @@ export const useIncomesStore = defineStore('incomes', () => {
 
   const loadCards = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/cards', {
+      const response = await axios.get(`${API_BASE}/api/cards`, {
         withCredentials: true
       })
       cards.value = response.data.cards
@@ -130,7 +131,7 @@ export const useIncomesStore = defineStore('incomes', () => {
 
   const addIncome = async () => {
     try {
-      const response = await axios.post('http://localhost:8080/api/incomes', form.value, {
+      const response = await axios.post(`${API_BASE}/api/incomes`, form.value, {
         withCredentials: true
       })
       await loadIncomes()

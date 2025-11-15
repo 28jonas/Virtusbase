@@ -35,3 +35,6 @@ Thumbs.db
 # Build outputs
 dist/
 build/
+
+#config
+./src/utils/config.js

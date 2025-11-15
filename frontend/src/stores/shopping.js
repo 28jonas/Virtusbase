@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { api } from '../services/api'
 import axios from 'axios'
+import { API_BASE } from '../utils/config'
 
 export const useShoppingStore = defineStore('shopping', {
   state: () => ({
@@ -12,7 +13,7 @@ export const useShoppingStore = defineStore('shopping', {
   actions: {
     async fetchShoppingLists() {
       try {
-        const response = await axios.get('http://localhost:8080/api/shopping-lists', {
+        const response = await axios.get(`${API_BASE}/api/shopping-lists`, {
           withCredentials: true // Zorg dat cookies worden meegestuurd
         })
         this.shoppingLists = response.data.data
@@ -25,7 +26,7 @@ export const useShoppingStore = defineStore('shopping', {
     async createShoppingList(listData) {
       try {
         //const response = await api.post('/api/shopping-lists', listData)
-        const response = await axios.post('http://localhost:8080/api/shopping-lists', listData, {
+        const response = await axios.post(`${API_BASE}/api/shopping-lists`, listData, {
           withCredentials: true // Dit is de correcte configuratie
         })
         this.shoppingLists.push(response.data.data)
@@ -37,7 +38,7 @@ export const useShoppingStore = defineStore('shopping', {
 
     async updateShoppingList(listId, payload) {
       try {
-        const response = await axios.put(`http://localhost:8080/api/shopping-lists/${listId}`, payload, {
+        const response = await axios.put(`${API_BASE}/api/shopping-lists/${listId}`, payload, {
           withCredentials: true
         })
         // Update de lijst in de store
@@ -54,7 +55,7 @@ export const useShoppingStore = defineStore('shopping', {
     async deleteShoppingList(listId) {
       try {
         //const response = await api.delete(`/api/shopping-lists/${listId}`)
-        const response = await axios.delete(`http://localhost:8080/api/shopping-lists/${listId}`, {
+        const response = await axios.delete(`${API_BASE}/api/shopping-lists/${listId}`, {
           withCredentials: true // Dit is de correcte configuratie
         })
         this.shoppingLists = this.shoppingLists.filter(list => list.id !== listId)
@@ -67,7 +68,7 @@ export const useShoppingStore = defineStore('shopping', {
     async fetchListItems(listId) {
       try {
         //const response = await api.get(`/api/shopping-lists/${listId}/items`)
-        const response = await axios.get(`http://localhost:8080/api/shopping-lists/${listId}/items`, {
+        const response = await axios.get(`${API_BASE}/api/shopping-lists/${listId}/items`, {
           withCredentials: true // Zorg dat cookies worden meegestuurd
         })
         this.currentItems = response.data.data
@@ -80,7 +81,7 @@ export const useShoppingStore = defineStore('shopping', {
     async addListItem(listId, itemData) {
       try {
         //const response = await api.post(`/api/shopping-lists/${listId}/items`, itemData)
-        const response = await axios.post(`http://localhost:8080/api/shopping-lists/${listId}/items`, itemData, {
+        const response = await axios.post(`${API_BASE}/api/shopping-lists/${listId}/items`, itemData, {
           withCredentials: true // Dit is de correcte configuratie
         })
         this.currentItems.push(response.data.data)
@@ -93,7 +94,7 @@ export const useShoppingStore = defineStore('shopping', {
     async toggleItemComplete(itemId) {
       try {
         //const response = await api.patch(`/api/shopping-items/${itemId}/toggle`)
-        const response = await axios.patch(`http://localhost:8080/api/shopping-items/${itemId}/toggle`, null, {
+        const response = await axios.patch(`${API_BASE}/api/shopping-items/${itemId}/toggle`, null, {
           withCredentials: true // Dit is de correcte configuratie
         })
         // Update the item in currentItems
@@ -110,7 +111,7 @@ export const useShoppingStore = defineStore('shopping', {
     async deleteListItem(itemId) {
       try {
         //const response = await api.delete(`/api/shopping-items/${itemId}`)
-        const response = await axios.delete(`http://localhost:8080/api/shopping-items/${itemId}`, {
+        const response = await axios.delete(`${API_BASE}/api/shopping-items/${itemId}`, {
           withCredentials: true // Dit is de correcte configuratie
         })
         this.currentItems = this.currentItems.filter(item => item.id !== itemId)

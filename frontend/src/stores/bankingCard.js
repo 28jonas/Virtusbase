@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import axios from 'axios'
+import { API_BASE } from '../utils/config'
 
 export const useCardStore = defineStore('card', () => {
   // State
@@ -44,7 +45,7 @@ export const useCardStore = defineStore('card', () => {
   // Actions
   const fetchCards = async () => {
     try {
-      const res = await axios.get('http://localhost:8080/api/cards', {
+      const res = await axios.get(`${API_BASE}/api/cards`, {
         withCredentials: true
       })
       cards.value = res.data.data.cards
@@ -57,7 +58,7 @@ export const useCardStore = defineStore('card', () => {
 
   const fetchBanks = async () => {
     try {
-      const res = await axios.get('http://localhost:8080/api/cards/banks', {
+      const res = await axios.get(`${API_BASE}/api/cards/banks`, {
         withCredentials: true
       })
       banks.value = res.data.data
@@ -75,7 +76,7 @@ export const useCardStore = defineStore('card', () => {
         balance: ensureNumber(payload.balance)
       }
 
-      const res = await axios.post('http://localhost:8080/api/cards', formattedPayload, {
+      const res = await axios.post(`${API_BASE}/api/cards`, formattedPayload, {
         withCredentials: true
       })
       cards.value.push(res.data.data)
@@ -95,7 +96,7 @@ export const useCardStore = defineStore('card', () => {
         balance: ensureNumber(payload.balance)
       }
 
-      const res = await axios.put(`http://localhost:8080/api/cards/${id}`, formattedPayload, {
+      const res = await axios.put(`${API_BASE}/api/cards/${id}`, formattedPayload, {
         withCredentials: true
       })
       const idx = cards.value.findIndex(c => c.id === id)
@@ -110,7 +111,7 @@ export const useCardStore = defineStore('card', () => {
 
   const deleteCard = async (id) => {
     try {
-      await axios.delete(`http://localhost:8080/api/cards/${id}`, {
+      await axios.delete(`${API_BASE}/api/cards/${id}`, {
         withCredentials: true
       })
       cards.value = cards.value.filter(c => c.id !== id)
@@ -129,7 +130,7 @@ export const useCardStore = defineStore('card', () => {
         amount: ensureNumber(payload.amount)
       }
 
-      const res = await axios.post('http://localhost:8080/api/cards/transfer', formattedPayload, {
+      const res = await axios.post(`${API_BASE}/api/cards/transfer`, formattedPayload, {
         withCredentials: true
       })
       // Refresh cards after transfer
@@ -143,7 +144,7 @@ export const useCardStore = defineStore('card', () => {
 
   const fetchStats = async () => {
     try {
-      const res = await axios.get('http://localhost:8080/api/cards/stats', {
+      const res = await axios.get(`${API_BASE}/api/cards/stats`, {
         withCredentials: true
       })
       stats.value = res.data.data

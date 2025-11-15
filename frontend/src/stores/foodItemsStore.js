@@ -2,6 +2,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import axios from 'axios'
+import { API_BASE } from '../utils/config'
 
 export const useFoodItemsStore = defineStore('foodItems', () => {
   const foodItems = ref([])
@@ -14,7 +15,7 @@ export const useFoodItemsStore = defineStore('foodItems', () => {
   const loadFoodItems = async (page = 1) => {
     isLoading.value = true
     try {
-      const response = await axios.get('http://localhost:8080/api/food-items', {
+      const response = await axios.get(`${API_BASE}/api/food-items`, {
         params: {
           search: search.value,
           showPublic: showPublic.value,
@@ -34,7 +35,7 @@ export const useFoodItemsStore = defineStore('foodItems', () => {
 
   const deleteFoodItem = async (id) => {
     try {
-      await axios.delete(`http://localhost:8080/api/food-items/${id}`, {
+      await axios.delete(`${API_BASE}/api/food-items/${id}`, {
         withCredentials: true
       })
       await loadFoodItems(currentPage.value)

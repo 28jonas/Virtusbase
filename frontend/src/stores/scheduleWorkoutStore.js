@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import axios from 'axios'
+import { API_BASE } from '../utils/config'
 
 export const useScheduleWorkoutStore = defineStore('scheduleWorkout', () => {
   // State
@@ -11,7 +12,7 @@ export const useScheduleWorkoutStore = defineStore('scheduleWorkout', () => {
   // Actions
   const loadExercises = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/schedule-workout/exercises', {
+      const response = await axios.get(`${API_BASE}/api/schedule-workout/exercises`, {
         withCredentials: true
       })
       exercises.value = response.data
@@ -24,7 +25,7 @@ export const useScheduleWorkoutStore = defineStore('scheduleWorkout', () => {
   const loadScheduleItems = async () => {
     isLoading.value = true
     try {
-      const response = await axios.get('http://localhost:8080/api/schedule-workout', {
+      const response = await axios.get(`${API_BASE}/api/schedule-workout`, {
         withCredentials: true
       })
       scheduleItems.value = response.data
@@ -39,7 +40,7 @@ export const useScheduleWorkoutStore = defineStore('scheduleWorkout', () => {
   const createWorkout = async (workoutData) => {
     isLoading.value = true
     try {
-      const response = await axios.post('http://localhost:8080/api/schedule-workout', workoutData, {
+      const response = await axios.post(`${API_BASE}/api/schedule-workout`, workoutData, {
         withCredentials: true
       })
       

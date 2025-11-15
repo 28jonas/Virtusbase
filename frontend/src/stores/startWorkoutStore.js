@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import axios from 'axios'
+import { API_BASE } from '../utils/config'
 
 export const useStartWorkoutStore = defineStore('startWorkout', () => {
   const scheduledWorkout = ref(null)
@@ -43,7 +44,7 @@ export const useStartWorkoutStore = defineStore('startWorkout', () => {
   const loadWorkoutData = async () => {
     isLoading.value = true
     try {
-      const response = await axios.get('http://localhost:8080/api/start-workout', {
+      const response = await axios.get(`${API_BASE}/api/start-workout`, {
         withCredentials: true
       })
       const data = response.data
@@ -84,7 +85,7 @@ export const useStartWorkoutStore = defineStore('startWorkout', () => {
   }
   try {
     await axios.post(
-      `http://localhost:8080/api/start-workout/${scheduledWorkout.value.id}/finish`, 
+      `${API_BASE}/api/start-workout/${scheduledWorkout.value.id}/finish`, 
       {}, // Lege request body
       {
         withCredentials: true  // Correcte positie voor config

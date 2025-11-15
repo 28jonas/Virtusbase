@@ -1,20 +1,21 @@
 <template>
-  <div class="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
-    <div class="flex h-screen">
-      <Sidebar />
-      <div class="flex-1 flex flex-col overflow-hidden">
-        <Header />
-        <main class="flex-1 overflow-y-auto">
-          <router-view />
-        </main>
-      </div>
-    </div>
-  </div>
+  <component :is="layout">
+    <router-view />
+  </component>
 </template>
 
 <script setup>
-import Sidebar from './components/layout/Sidebar.vue'
-import Header from './components/layout/Header.vue'
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
+import DefaultLayout from './components/layout/DefaultLayout.vue'
+import EmptyLayout from './components/layout/EmptyLayout.vue'
+
+const route = useRoute()
+
+const layout = computed(() => {
+  const layoutName = route.meta.layout || 'default'
+  return layoutName === 'default' ? DefaultLayout : EmptyLayout
+})
 </script>
 
 <style>
