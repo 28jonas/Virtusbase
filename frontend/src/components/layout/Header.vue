@@ -208,22 +208,28 @@ const defaultNotifications = [
 ]
 
 // User gegevens
-const userInitials = 'JA'
-const userName = 'John Appleseed'
-const userEmail = 'john.appleseed@voorbeeld.nl'
+const authUser = computed(() => authStore.user || {})
+const userInitials = computed(() => {
+  const names = authUser.value.name ? authUser.value.name.split(' ') : []
+  const initials = names.map(n => n.charAt(0).toUpperCase()).join('')
+  return initials.slice(0, 2)
+})
+const userName = authUser.value.name
+const userEmail = authUser.value.email
 
 // Computed properties
 const currentRouteTitle = computed(() => {
+  console.log('Route name:', route.name)
   const routeName = route.name
   const titles = {
-    'dashboard': 'Dashboard',
-    'families': 'Familie Beheer',
-    'habits': 'Gewoontes',
-    'shopping': 'Boodschappen',
-    'todos': 'Todo\'s',
-    'calendar': 'Kalender'
+    'Dashboard': 'Dashboard',
+    'Families': 'Familie Beheer',
+    'Habits': 'Gewoontes',
+    'Shopping': 'Boodschappen',
+    'Todo': 'Todo\'s',
+    'Calendar': 'Kalender',
   }
-  return titles[routeName] || 'Life Manager'
+  return titles[routeName] || 'Virtusbase'
 })
 
 const currentDate = computed(() => {
