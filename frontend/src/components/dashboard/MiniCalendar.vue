@@ -12,14 +12,16 @@
         <div class="w-2 h-8 rounded-full" :class="eventTypeClasses[event.type]"></div>
         <div class="flex-1">
           <div class="font-medium text-gray-900 dark:text-white">{{ event.title }}</div>
-          <div class="text-sm text-gray-500 dark:text-gray-400">{{ event.time }}</div>
+          <div class="text-sm text-gray-500 dark:text-gray-400">{{ event.end }}</div>
         </div>
       </div>
     </div>
     
-    <button class="w-full mt-4 py-2 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors">
-      Bekijk volledige kalender
-    </button>
+    <a href="/calendar">
+      <button class="w-full mt-4 py-2 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors">
+        Bekijk volledige kalender
+      </button>
+    </a>
   </div>
 </template>
 

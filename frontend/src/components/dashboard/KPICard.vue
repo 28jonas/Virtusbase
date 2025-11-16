@@ -17,11 +17,11 @@
     <p class="text-gray-400 dark:text-gray-500 text-sm">{{ subtitle }}</p>
     
     <!-- Progress bar -->
-    <div class="mt-4 w-full bg-gray-100 dark:bg-gray-700 rounded-full h-1">
+    <!-- <div class="mt-4 w-full bg-gray-100 dark:bg-gray-700 rounded-full h-1">
       <div class="h-1 rounded-full transition-all duration-1000 ease-out"
         :class="colorProgress[color]"
         :style="{ width: '70%' }"></div>
-    </div>
+    </div> -->
   </div>
 </template>
 

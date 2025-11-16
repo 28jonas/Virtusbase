@@ -17,8 +17,8 @@ return new class extends Migration
             // Koppeling naar kalender
             $table->foreignId('calendar_id')->constrained()->onDelete('cascade');
             // Polymorfe eigenaar (voor wie het event is)
-            $table->unsignedBigInteger('owner_id');
-            $table->string('owner_type');
+            //$table->unsignedBigInteger('owner_id');
+            //$table->string('owner_type');
             $table->timestamps();
         });
     }

@@ -1,13 +1,14 @@
 <!-- views/Dashboard.vue -->
 <template>
   <div class="p-6 space-y-8 animate-fade-in">
-    
+
     <!-- Welkom Header -->
-    <div class="glass-effect rounded-3xl p-8 border border-gray-100 dark:border-gray-800 transition-all duration-300 hover:shadow-sm">
+    <div
+      class="glass-effect rounded-3xl p-8 border border-gray-100 dark:border-gray-800 transition-all duration-300 hover:shadow-sm">
       <div class="flex items-center justify-between">
         <div>
           <h1 class="text-4xl font-light text-gray-900 dark:text-white mb-3">
-            Goedemorgen, <span class="font-medium">{{ user?.name || 'Gebruiker' }}</span>
+            Goedemorgen, <span class="font-medium">{{ utilsStore.capitalizeFirst(user?.name || 'gebruiker') }}</span>
           </h1>
           <p class="text-lg text-gray-600 dark:text-gray-400 max-w-2xl">
             "Een moment van rust is een moment van helderheid. Wat wil je vandaag bereiken?"
@@ -32,10 +33,7 @@
       <p class="text-gray-600 dark:text-gray-400 mb-4">
         We konden de data niet laden. Probeer de pagina te vernieuwen.
       </p>
-      <button 
-        @click="loadData"
-        class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors"
-      >
+      <button @click="loadData" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors">
         Opnieuw proberen
       </button>
     </div>
@@ -43,60 +41,35 @@
     <!-- Content wanneer geladen -->
     <div v-else>
       <!-- KPI Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <KPICard 
-          title="Familie Overzicht"
-          :value="stats.families"
-          subtitle="Actieve families"
-          icon="👨‍👩‍👧‍👦"
-          trend="+2 deze maand"
-          color="blue"
-        />
-        <KPICard 
-          title="Habit Streak"
-          :value="stats.habitStreak"
-          subtitle="dagen consistent"
-          icon="🔥"
-          trend="+5 dagen"
-          color="green"
-        />
-        <KPICard 
-          title="Open Taken"
-          :value="stats.openTodos"
-          subtitle="voor vandaag"
-          icon="📝"
-          trend="-3 sinds gisteren"
-          color="orange"
-        />
-        <KPICard 
-          title="Productiviteit"
-          :value="`${stats.productivity}%`"
-          subtitle="van doelen bereikt"
-          icon="📈"
-          trend="+12%"
-          color="purple"
-        />
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-2">
+        <KPICard title="Familie Overzicht" :value="stats.families" subtitle="Actieve families" icon="👨‍👩‍👧‍👦"
+          color="blue" />
+        <!-- trend="+2 deze maand" (maakt een trend aan met de vorige maand in het component kpicard) -->
+        <KPICard title="Habit Streak" :value="stats.habitStreak" subtitle="dagen consistent" icon="🔥" color="green" />
+        <KPICard title="Open Taken" :value="stats.openTodos" subtitle="voor vandaag" icon="📝" color="orange" />
+        <!-- <KPICard title="Productiviteit" :value="`${stats.productivity}%`" subtitle="van doelen bereikt" icon="📈"
+          color="purple" /> -->
       </div>
 
       <!-- Main Content Grid -->
       <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
-        
+
         <!-- Linkerkolom -->
         <div class="space-y-8">
           <TodayTasks :tasks="sortedTodayTasks" />
           <HabitProgress :habits="todayHabits" />
         </div>
-        
+
         <!-- Middelkolom -->
         <div class="space-y-8">
           <FocusTimer />
           <MiniCalendar :events="todayEvents" />
         </div>
-        
+
         <!-- Rechterkolom -->
         <div class="space-y-8">
           <QuickActions />
-          <WeeklyInsights :data="weeklyData" />
+          <!-- <WeeklyInsights :data="weeklyData" /> -->
         </div>
       </div>
     </div>
@@ -119,6 +92,7 @@ import { useHabitStore } from '../stores/habit'
 import { useTodoStore } from '../stores/todo'
 import { useCalendarStore } from '../stores/calendar'
 import { useEventStore } from '../stores/event'
+import { useUtilsStore } from '../stores/utils'
 
 const authStore = useAuthStore()
 const familyStore = useFamilyStore()
@@ -126,6 +100,7 @@ const habitStore = useHabitStore()
 const todoStore = useTodoStore()
 const calendarStore = useCalendarStore()
 const eventStore = useEventStore()
+const utilsStore = useUtilsStore()
 
 const user = ref(null)
 const loading = ref(true)
@@ -135,12 +110,12 @@ const loadData = async () => {
   try {
     loading.value = true
     hasError.value = false
-    
+
     console.log('Starting data load...')
-    
+
     // 1. Laad user info eerst
-    //user.value = await authStore.meInfo()
-    //console.log('User loaded:', user.value)
+    user.value = await authStore.getLoggedInUser()
+    console.log('User loaded:', user.value)
 
     // 2. Laad alle data parallel
     await Promise.all([
@@ -180,7 +155,7 @@ const sortedTodayTasks = computed(() => {
   const todos = todoStore.todos || []
   const todayTasks = todos.filter(todo => !todo.completed)
   const priorityOrder = { high: 3, medium: 2, low: 1 }
-  
+
   return todayTasks.sort((a, b) => {
     return priorityOrder[b.priority] - priorityOrder[a.priority]
   })

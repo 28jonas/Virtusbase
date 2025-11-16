@@ -3,10 +3,18 @@
   <header class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-6 py-4">
     <div class="flex items-center justify-between">
       <div class="flex items-center space-x-4">
+        <!-- Mobile Menu Button -->
+        <button 
+          @click="$emit('toggle-sidebar')"
+          class="lg:hidden w-10 h-10 rounded-lg flex items-center justify-center text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+        >
+          <span class="text-xl">☰</span>
+        </button>
+        
         <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">
           {{ currentRouteTitle }}
         </h1>
-        <div class="text-sm text-gray-500 dark:text-gray-400">
+        <div class="text-sm text-gray-500 dark:text-gray-400 hidden sm:block">
           {{ currentDate }}
         </div>
       </div>
@@ -151,6 +159,9 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
 import {useAuthStore} from '../../stores/auth'
+
+// Define emits voor de toggle functionaliteit
+defineEmits(['toggle-sidebar'])
 
 const route = useRoute()
 const authStore = useAuthStore()

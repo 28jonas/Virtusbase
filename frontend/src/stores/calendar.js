@@ -18,7 +18,7 @@ export const useCalendarStore = defineStore('calendar', () => {
       const response = await axios.get(`${API_BASE}/api/calendars`, {
         withCredentials: true // Zorg dat cookies worden meegestuurd
       })
-      console.log(response.data.data)  
+      console.log("data in calendar.js:", response.data.data)  
       calendars.value = response.data.data
       console.log(calendars.value)
     } catch (error) {

@@ -77,11 +77,12 @@ class EventController extends BaseApiController
             'calendar_id' => 'required|exists:calendars,id',
             'start' => 'required|date',
             'end' => 'nullable|date|after:start',
-            'owner_type' => 'required|in:user,family',
-            'family_id' => 'nullable|required_if:owner_type,family|exists:families,id',
+            //'owner_type' => 'required|in:user,family',
+            //'family_id' => 'nullable|required_if:owner_type,family|exists:families,id',
         ]);
 
         if ($validator->fails()) {
+            Log::error('Validation Error.', [$validator->errors()]);
             return $this->sendError('Validation Error.', $validator->errors(), 422);
         }
         Log::info('Store event request data:', $request->all());
@@ -95,21 +96,21 @@ class EventController extends BaseApiController
 
         $data = $request->all();
 
-        // Bepaal eigenaar voor het event
-        if ($request->owner_type === 'family') {
-            $family = Family::find($request->family_id);
-            // if (!auth()->user()->families->contains($family->id)) {
-            //     return $this->sendError('Unauthorized access to family.', [], 403);
-            // }
-            $data['owner_type'] = Family::class;
-            $data['owner_id'] = $family->id;
-        } else {
-            $data['owner_type'] = Profile::class;
-            $userId = request()->user['id'];
-            $data['owner_id'] = $userId;
-        }
+        // // Bepaal eigenaar voor het event
+        // if ($request->owner_type === 'family') {
+        //     $family = Family::find($request->family_id);
+        //     // if (!auth()->user()->families->contains($family->id)) {
+        //     //     return $this->sendError('Unauthorized access to family.', [], 403);
+        //     // }
+        //     $data['owner_type'] = Family::class;
+        //     $data['owner_id'] = $family->id;
+        // } else {
+        //     $data['owner_type'] = Profile::class;
+        //     $userId = request()->user['id'];
+        //     $data['owner_id'] = $userId;
+        // }
 
-        unset($data['family_id']);
+        // unset($data['family_id']);
 
         $event = Event::create($data);
 

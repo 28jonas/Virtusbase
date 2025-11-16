@@ -5,7 +5,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Event extends Model
 {
-    protected $fillable = ['title', 'description', 'start', 'end', 'location', 'calendar_id', 'owner_id', 'owner_type'];
+    protected $fillable = ['title', 'description', 'start', 'end', 'location', 'calendar_id'];
     protected $dates = ['start', 'end'];
 
     public function owner() {
