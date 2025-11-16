@@ -20,11 +20,11 @@ export const useFamilyStore = defineStore('family', () => {
       const response = await axios.get(`${API_BASE}/api/families`, {
         withCredentials: true
       })
-      
+
       console.log('Families response:', response.data)
       families.value = response.data.data || []
       console.log('Families stored:', families.value.length)
-      
+
       return families.value
     } catch (err) {
       error.value = err.response?.data?.message || 'Failed to fetch families'
@@ -60,16 +60,29 @@ export const useFamilyStore = defineStore('family', () => {
         family_id: familyId,
         role: memberRole
       }
-      
+
       const response = await axios.post(`${API_BASE}/api/families/${familyId}/members`, memberData, {
         withCredentials: true
       })
-      
+
       await fetchFamilies() // Refresh de families
       return response.data
     } catch (err) {
       console.error('Error adding member:', err)
       throw err.response?.data || err
+    }
+  }
+
+  // In je family store
+  const removeMember = async (memberId, familyId) => {
+    try {
+      const response = await axios.delete(`${API_BASE}/api/families/${familyId}/members/${memberId}`, {
+        withCredentials: true
+      })
+      return response.data
+    } catch (error) {
+      console.error('Error removing member:', error)
+      throw error
     }
   }
 
@@ -80,7 +93,7 @@ export const useFamilyStore = defineStore('family', () => {
       const response = await axios.get(`${API_BASE}/api/families/${id}`, {
         withCredentials: true
       })
-      
+
       currentFamily.value = response.data
       return response.data
     } catch (err) {
@@ -101,13 +114,14 @@ export const useFamilyStore = defineStore('family', () => {
     currentFamily,
     loading,
     error,
-    
+
     // Actions
     fetchFamilies,
     createFamily,
     addMember,
+    removeMember,
     fetchFamilyById,
-    
+
     // Getters
     familiesCount
   }

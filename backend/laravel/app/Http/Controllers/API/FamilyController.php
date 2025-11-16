@@ -13,22 +13,24 @@ use Illuminate\Support\Facades\DB;
 class FamilyController extends BaseApiController
 {
     public function index()
-    {
-        Log::info('[FamilyController@index] JWT payload user:', [
-            'user' => request()->user
-        ]);
+{
+    Log::info('[FamilyController@index] JWT payload user:', [
+        'user' => request()->user
+    ]);
 
-        // Gebruik de user ID uit JWT i.p.v. database user
-        $userId = request()->user['id'];
+    // Gebruik de user ID uit JWT i.p.v. database user
+    $userId = request()->user['id'];
 
-        // Vervang auth()->user() door:
-        $families = Family::whereHas('members', function ($query) use ($userId) {
-            $query->where('profile_id', $userId);
-        })->with('members')->get();
+    // Vervang auth()->user() door:
+    $families = Family::whereHas('members', function ($query) use ($userId) {
+        $query->where('profile_id', $userId);
+    })->with(['members' => function ($query) {
+        $query->select('profiles.id', 'profiles.first_name', 'profiles.last_name', 'profiles.email', 'profiles.profile_picture')
+              ->withPivot('role');
+    }])->get();
 
-
-        return $this->sendResponse($families, 'Families retrieved successfully.');
-    }
+    return $this->sendResponse($families, 'Families retrieved successfully.');
+}
 
     public function store(Request $request)
     {
@@ -146,10 +148,15 @@ class FamilyController extends BaseApiController
 
     public function addMember(Request $request, Family $family)
     {
+        Log::info('[FamilyController@addMember] Request to add member:', [
+            'request' => $request->all(),
+            'family_id' => $family->id
+        ]);
         $userId = $request->user['id'];
         $requestingProfile = Profile::find($userId);
         // Authorisatie: heeft user rechten om leden toe te voegen?
         if (!$requestingProfile) {
+            Log::error('[FamilyController@addMember] Requesting user not found.');
             return response()->json([
                 'success' => false,
                 'message' => 'Requesting user not found.'
@@ -157,6 +164,10 @@ class FamilyController extends BaseApiController
         }
 
         if (!$requestingProfile->hasPermissionInFamily($family, 'invite_members')) {
+            Log::error('[FamilyController@addMember] Unauthorized to add members.', [
+                'requesting_profile_id' => $requestingProfile->id,
+                'family_id' => $family->id
+            ]);
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthorized to add members.'
@@ -185,7 +196,7 @@ class FamilyController extends BaseApiController
             'request'=> $request->all(),
         ]);
         // Voeg gebruiker toe aan gezin
-        $family->members()->attach($profile->id, ['role' => 1]);
+        $family->members()->attach($profile->id, ['role' => $request->role]);
 
         return $this->sendResponse(null, 'Member added successfully.');
     }
@@ -193,9 +204,9 @@ class FamilyController extends BaseApiController
     public function removeMember(Family $family, Profile $member)
     {
         // Authorisatie: heeft user rechten om leden te verwijderen?
-        if (!auth()->user()->hasPermissionInFamily($family, 'remove_members')) {
-            return $this->sendError('Unauthorized to remove members.', [], 403);
-        }
+        // if (!auth()->user()->hasPermissionInFamily($family, 'remove_members')) {
+        //     return $this->sendError('Unauthorized to remove members.', [], 403);
+        // }
 
         $family->members()->detach($member->id);
 
