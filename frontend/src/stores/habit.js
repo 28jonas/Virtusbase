@@ -82,7 +82,7 @@ export const useHabitStore = defineStore('habit', () => {
 
   const toggleHabitCompletion = async (habitId, date) => {
   try {
-    const res = await axios.patch(`${API_BASE}/api/habits/${habitId}/toggle-completion`, 
+    const res = await axios.put(`${API_BASE}/api/habits/${habitId}/toggle-completion`, 
       { date },
       { withCredentials: true }
     )

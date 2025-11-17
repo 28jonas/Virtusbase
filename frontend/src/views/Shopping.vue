@@ -31,10 +31,10 @@
           </p>
         </div>
         <div class="flex space-x-2">
-          <button
+          <!-- <button
             class="px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
             Sorteer
-          </button>
+          </button> -->
           <button @click="showAddItemModal = true"
             class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
             + Item

@@ -124,7 +124,7 @@ Route::middleware('jwt.validate')->group(function () {
     //habits
     Route::get('/habits/stats', [HabitController::class, 'getStats']);
     Route::apiResource('habits', HabitController::class);
-    Route::patch('/habits/{habit}/toggle-completion', [HabitController::class, 'toggleCompletion']);
+    Route::put('/habits/{habit}/toggle-completion', [HabitController::class, 'toggleCompletion']);
     Route::post('/habits/{habit}/log-completion', [HabitController::class, 'logCompletion']);
     Route::get('/habits/week/data', [HabitController::class, 'getWeekData']);
 
